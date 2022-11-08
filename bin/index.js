@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-const meow = require('meow')
-const update = require('../lib')
+const meow = require("meow");
+const createOrUpdate = require("../lib");
 
-const cli = meow(`
+const cli = meow(
+  `
     Updates the dnslink for a Cloudflare configuration. Both the CF_API_KEY and CF_API_EMAIL environment
     variables or the CF_API_TOKEN environment variable must be set.
   
@@ -14,55 +15,65 @@ const cli = meow(`
       --domain, -d      Cloudflare domain name
       --link, -k        dnslink value, eg. ipfs path
       --record, -r      Domain record name
-`, {
-  flags: {
-    domain: {
-      type: 'string',
-      alias: 'd',
-      isRequired: true
+`,
+  {
+    flags: {
+      domain: {
+        type: "string",
+        alias: "d",
+        isRequired: true,
+      },
+      link: {
+        type: "string",
+        alias: "l",
+        isRequired: true,
+      },
+      record: {
+        alias: "r",
+        type: "string",
+        default: "@",
+      },
     },
-    link: {
-      type: 'string',
-      alias: 'l',
-      isRequired: true
-    },
-    record: {
-      alias: 'r',
-      type: 'string',
-      default: '@'
-    }
   }
-})
+);
 
-async function run () {
-  const key = process.env.CF_API_KEY
-  const email = process.env.CF_API_EMAIL
-  const token = process.env.CF_API_TOKEN
+async function run() {
+  const key = process.env.CF_API_KEY;
+  const email = process.env.CF_API_EMAIL;
+  const token = process.env.CF_API_TOKEN;
 
   if ((!key || !email) && !token) {
-    cli.showHelp()
-    return
+    cli.showHelp();
+    return;
   }
 
   const api = {
     key,
     email,
-    token
-  }
+    token,
+  };
 
   const opts = {
-    record: cli.flags.record === '@' ? cli.flags.domain : `${cli.flags.record}.${cli.flags.domain}`,
+    record:
+      cli.flags.record === "@"
+        ? cli.flags.domain
+        : `${cli.flags.record}.${cli.flags.domain}`,
     zone: cli.flags.domain,
-    link: cli.flags.link
-  }
+    link: cli.flags.link,
+  };
 
   try {
-    const content = await update(api, opts)
-    console.log(`Updated TXT ${opts.record} to ${content}`)
+    console.log(`Updating ${opts.record} to ${opts.link}, zone: ${opts.zone}`);
+    const result = await createOrUpdate(api, opts);
+    console.log(
+      `dnslink-cloudflare: success set ${opts.record} to ${opts.link}, result: ${result.result}`
+    );
   } catch (err) {
-    console.log(err)
-    process.exit(1)
+    console.log(
+      `dnslink-cloudflare: failed to set link ${opts.record} to ${opts.link}, error: ${err.message}`
+    );
+    process.exit(1);
   }
 }
 
-run()
+run();

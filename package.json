@@ -1,6 +1,6 @@
 {
-  "name": "dnslink-cloudflare",
-  "version": "3.0.0",
+  "name": "@orca-x/dnslink-cloudflare",
+  "version": "3.0.3",
   "description": "Update dnslink TXT records in Cloudflare",
   "main": "./lib/index.js",
   "bin": {
@@ -16,13 +16,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ipfs-shipyard/dnslink-cloudflare"
+    "url": "https://github.com/orca-x/dnslink-cloudflare"
   },
   "dependencies": {
     "got": "^11.8.2",
-    "meow": "^10.0.0"
+    "meow": "^9.0.0",
+    "debug": "^4.3.4"
   },
   "devDependencies": {
-    "standard": "^16.0.3"
+    "prettier": "^2.3.2"
   }
 }
